@@ -92,7 +92,6 @@ public class SchemaRegistryProfilerMain {
                     json.get("high").getAsFloat(),
                     json.get("low").getAsFloat(),
                     json.get("close").getAsFloat(),
-                    json.get("volume").getAsInt(),
                     json.get("symbol").getAsString());
         }
         catch (NullPointerException e){

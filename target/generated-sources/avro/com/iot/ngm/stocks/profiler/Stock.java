@@ -14,10 +14,10 @@ import org.apache.avro.message.SchemaStore;
 
 @org.apache.avro.specific.AvroGenerated
 public class Stock extends org.apache.avro.specific.SpecificRecordBase implements org.apache.avro.specific.SpecificRecord {
-  private static final long serialVersionUID = -3768492376327127036L;
+  private static final long serialVersionUID = 1006622375104868042L;
 
 
-  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Stock\",\"namespace\":\"com.iot.ngm.stocks.profiler\",\"fields\":[{\"name\":\"time\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"},\"doc\":\"Interval for which the rest of the fields are applied\"},{\"name\":\"open\",\"type\":\"float\",\"doc\":\"Open stock price\"},{\"name\":\"high\",\"type\":\"float\",\"doc\":\"Highest stock price within interval\"},{\"name\":\"low\",\"type\":\"float\",\"doc\":\"Lowest stock price within interval\"},{\"name\":\"close\",\"type\":\"float\",\"doc\":\"Close stock price\"},{\"name\":\"volume\",\"type\":\"int\",\"doc\":\"Transactions volume\"},{\"name\":\"symbol\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"Name of the equity\"}],\"version\":\"1\"}");
+  public static final org.apache.avro.Schema SCHEMA$ = new org.apache.avro.Schema.Parser().parse("{\"type\":\"record\",\"name\":\"Stock\",\"namespace\":\"com.iot.ngm.stocks.profiler\",\"fields\":[{\"name\":\"time\",\"type\":{\"type\":\"long\",\"logicalType\":\"timestamp-millis\"},\"doc\":\"Interval for which the rest of the fields are applied\"},{\"name\":\"open\",\"type\":\"float\",\"doc\":\"Open stock price\"},{\"name\":\"high\",\"type\":\"float\",\"doc\":\"Highest stock price within interval\"},{\"name\":\"low\",\"type\":\"float\",\"doc\":\"Lowest stock price within interval\"},{\"name\":\"close\",\"type\":\"float\",\"doc\":\"Close stock price\"},{\"name\":\"symbol\",\"type\":{\"type\":\"string\",\"avro.java.string\":\"String\"},\"doc\":\"Name of the equity\"}],\"version\":\"1\"}");
   public static org.apache.avro.Schema getClassSchema() { return SCHEMA$; }
 
   private static final SpecificData MODEL$ = new SpecificData();
@@ -86,8 +86,6 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
   private float low;
   /** Close stock price */
   private float close;
-  /** Transactions volume */
-  private int volume;
   /** Name of the equity */
   private java.lang.String symbol;
 
@@ -105,16 +103,14 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
    * @param high Highest stock price within interval
    * @param low Lowest stock price within interval
    * @param close Close stock price
-   * @param volume Transactions volume
    * @param symbol Name of the equity
    */
-  public Stock(java.time.Instant time, java.lang.Float open, java.lang.Float high, java.lang.Float low, java.lang.Float close, java.lang.Integer volume, java.lang.String symbol) {
+  public Stock(java.time.Instant time, java.lang.Float open, java.lang.Float high, java.lang.Float low, java.lang.Float close, java.lang.String symbol) {
     this.time = time.truncatedTo(java.time.temporal.ChronoUnit.MILLIS);
     this.open = open;
     this.high = high;
     this.low = low;
     this.close = close;
-    this.volume = volume;
     this.symbol = symbol;
   }
 
@@ -128,8 +124,7 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
     case 2: return high;
     case 3: return low;
     case 4: return close;
-    case 5: return volume;
-    case 6: return symbol;
+    case 5: return symbol;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -137,7 +132,6 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
   private static final org.apache.avro.Conversion<?>[] conversions =
       new org.apache.avro.Conversion<?>[] {
       new org.apache.avro.data.TimeConversions.TimestampMillisConversion(),
-      null,
       null,
       null,
       null,
@@ -160,8 +154,7 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
     case 2: high = (java.lang.Float)value$; break;
     case 3: low = (java.lang.Float)value$; break;
     case 4: close = (java.lang.Float)value$; break;
-    case 5: volume = (java.lang.Integer)value$; break;
-    case 6: symbol = value$ != null ? value$.toString() : null; break;
+    case 5: symbol = value$ != null ? value$.toString() : null; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
   }
@@ -212,16 +205,6 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
    */
   public float getClose() {
     return close;
-  }
-
-
-
-  /**
-   * Gets the value of the 'volume' field.
-   * @return Transactions volume
-   */
-  public int getVolume() {
-    return volume;
   }
 
 
@@ -287,8 +270,6 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
     private float low;
     /** Close stock price */
     private float close;
-    /** Transactions volume */
-    private int volume;
     /** Name of the equity */
     private java.lang.String symbol;
 
@@ -323,13 +304,9 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
         this.close = data().deepCopy(fields()[4].schema(), other.close);
         fieldSetFlags()[4] = other.fieldSetFlags()[4];
       }
-      if (isValidValue(fields()[5], other.volume)) {
-        this.volume = data().deepCopy(fields()[5].schema(), other.volume);
+      if (isValidValue(fields()[5], other.symbol)) {
+        this.symbol = data().deepCopy(fields()[5].schema(), other.symbol);
         fieldSetFlags()[5] = other.fieldSetFlags()[5];
-      }
-      if (isValidValue(fields()[6], other.symbol)) {
-        this.symbol = data().deepCopy(fields()[6].schema(), other.symbol);
-        fieldSetFlags()[6] = other.fieldSetFlags()[6];
       }
     }
 
@@ -359,13 +336,9 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
         this.close = data().deepCopy(fields()[4].schema(), other.close);
         fieldSetFlags()[4] = true;
       }
-      if (isValidValue(fields()[5], other.volume)) {
-        this.volume = data().deepCopy(fields()[5].schema(), other.volume);
+      if (isValidValue(fields()[5], other.symbol)) {
+        this.symbol = data().deepCopy(fields()[5].schema(), other.symbol);
         fieldSetFlags()[5] = true;
-      }
-      if (isValidValue(fields()[6], other.symbol)) {
-        this.symbol = data().deepCopy(fields()[6].schema(), other.symbol);
-        fieldSetFlags()[6] = true;
       }
     }
 
@@ -585,49 +558,6 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
     }
 
     /**
-      * Gets the value of the 'volume' field.
-      * Transactions volume
-      * @return The value.
-      */
-    public int getVolume() {
-      return volume;
-    }
-
-
-    /**
-      * Sets the value of the 'volume' field.
-      * Transactions volume
-      * @param value The value of 'volume'.
-      * @return This builder.
-      */
-    public com.iot.ngm.stocks.profiler.Stock.Builder setVolume(int value) {
-      validate(fields()[5], value);
-      this.volume = value;
-      fieldSetFlags()[5] = true;
-      return this;
-    }
-
-    /**
-      * Checks whether the 'volume' field has been set.
-      * Transactions volume
-      * @return True if the 'volume' field has been set, false otherwise.
-      */
-    public boolean hasVolume() {
-      return fieldSetFlags()[5];
-    }
-
-
-    /**
-      * Clears the value of the 'volume' field.
-      * Transactions volume
-      * @return This builder.
-      */
-    public com.iot.ngm.stocks.profiler.Stock.Builder clearVolume() {
-      fieldSetFlags()[5] = false;
-      return this;
-    }
-
-    /**
       * Gets the value of the 'symbol' field.
       * Name of the equity
       * @return The value.
@@ -644,9 +574,9 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
       * @return This builder.
       */
     public com.iot.ngm.stocks.profiler.Stock.Builder setSymbol(java.lang.String value) {
-      validate(fields()[6], value);
+      validate(fields()[5], value);
       this.symbol = value;
-      fieldSetFlags()[6] = true;
+      fieldSetFlags()[5] = true;
       return this;
     }
 
@@ -656,7 +586,7 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
       * @return True if the 'symbol' field has been set, false otherwise.
       */
     public boolean hasSymbol() {
-      return fieldSetFlags()[6];
+      return fieldSetFlags()[5];
     }
 
 
@@ -667,7 +597,7 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
       */
     public com.iot.ngm.stocks.profiler.Stock.Builder clearSymbol() {
       symbol = null;
-      fieldSetFlags()[6] = false;
+      fieldSetFlags()[5] = false;
       return this;
     }
 
@@ -681,8 +611,7 @@ public class Stock extends org.apache.avro.specific.SpecificRecordBase implement
         record.high = fieldSetFlags()[2] ? this.high : (java.lang.Float) defaultValue(fields()[2]);
         record.low = fieldSetFlags()[3] ? this.low : (java.lang.Float) defaultValue(fields()[3]);
         record.close = fieldSetFlags()[4] ? this.close : (java.lang.Float) defaultValue(fields()[4]);
-        record.volume = fieldSetFlags()[5] ? this.volume : (java.lang.Integer) defaultValue(fields()[5]);
-        record.symbol = fieldSetFlags()[6] ? this.symbol : (java.lang.String) defaultValue(fields()[6]);
+        record.symbol = fieldSetFlags()[5] ? this.symbol : (java.lang.String) defaultValue(fields()[5]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
         throw e;

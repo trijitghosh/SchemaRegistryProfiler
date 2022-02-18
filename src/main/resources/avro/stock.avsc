@@ -9,7 +9,6 @@
     { "name": "high", "type": "float", "doc": "Highest stock price within interval" },
     { "name": "low", "type": "float", "doc": "Lowest stock price within interval" },
     { "name": "close", "type": "float", "doc": "Close stock price" },
-    { "name": "volume", "type": "int", "doc": "Transactions volume" },
     { "name": "symbol", "type": "string", "doc": "Name of the equity" }
   ]
 }
