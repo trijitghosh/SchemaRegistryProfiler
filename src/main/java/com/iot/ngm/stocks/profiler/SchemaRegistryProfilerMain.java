@@ -74,7 +74,7 @@ public class SchemaRegistryProfilerMain {
                 Stock stock = parseJsonToStock(v);
                 log.info("Parsed stock to avro: " + stock);
                 if(stock!=null) {
-                    kProducer.send(new ProducerRecord<>(targetTopic, stock));
+                    kProducer.send(new ProducerRecord<>(targetTopic, stock.getSymbol(), stock));
                     log.info("Sent stock to [" + appConfig.getParsedTopicName() + "] topic.");
                 }
             }
