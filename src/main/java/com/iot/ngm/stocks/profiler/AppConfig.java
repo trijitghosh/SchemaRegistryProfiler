@@ -42,8 +42,12 @@ public class AppConfig {
         return consumerGroupId;
     }
 
-    public long getConsumerPollInterval() { return consumerPollInterval; }
+    public long getConsumerPollInterval() {
+        return consumerPollInterval;
+    }
 
-    public String getTimestampFormat() { return timestampFormat; }
+    public String getTimestampFormat() {
+        return timestampFormat;
+    }
 
 }

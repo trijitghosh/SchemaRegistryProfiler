@@ -1,5 +1,6 @@
 package com.iot.ngm.stocks.profiler;
 
+import com.iot.ngm.stocks.dtos.Stock;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.typesafe.config.ConfigFactory;
