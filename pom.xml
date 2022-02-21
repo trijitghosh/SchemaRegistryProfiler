@@ -32,14 +32,6 @@
     </repositories>
 
     <dependencies>
-
-        <!-- to fetch avro schemas defined for the project scope -->
-        <dependency>
-            <groupId>com.iot.ngm.stocks.dtos</groupId>
-            <artifactId>AvroSchemas</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <!-- for avro -->
         <!-- https://mvnrepository.com/artifact/org.apache.avro/avro -->
         <dependency>
