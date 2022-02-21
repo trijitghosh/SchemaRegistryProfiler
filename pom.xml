@@ -155,7 +155,7 @@
                             <imports>
                                 <import>${project.build.directory}/maven-shared-archive-resources/</import>
                             </imports>
-                            <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
+                            <sourceDirectory>${project.basedir}/src/main/resources</sourceDirectory> <!-- not used, only imports folder is used -->
                             <stringType>String</stringType>
                             <createSetters>false</createSetters>
                             <enableDecimalLogicalType>true</enableDecimalLogicalType>
