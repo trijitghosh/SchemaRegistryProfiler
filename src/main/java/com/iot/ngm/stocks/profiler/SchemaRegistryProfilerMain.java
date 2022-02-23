@@ -1,88 +1,99 @@
 package com.iot.ngm.stocks.profiler;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.iot.ngm.stocks.dtos.Stock;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.typesafe.config.ConfigFactory;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import io.confluent.kafka.serializers.KafkaAvroSerializerConfig;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.*;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
+import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Properties;
 
 public class SchemaRegistryProfilerMain {
 
     private static Logger log;
     private static AppConfig appConfig;
-    private static KafkaConsumer<String, String> kConsumer;
-    private static KafkaProducer<String, Stock> kProducer;
-    //String dummyEvent = "{\"time\": \"2022-02-16 19:17:00\", \"open\": 129.12, \"high\": 129.12, \"low\": 129.09, \"close\": 129.09, \"volume\": 402, \"symbol\": \"IBM\"}";
-    //{"time": "2022-02-16 19:17:00", "open": 129.12, "high": 129.12, "low": 129.09, "close": 129.09, "volume": 402, "symbol": "IBM"}
+    private static Gson gson;
 
-    public static void main(String[] args) {
+    public SchemaRegistryProfilerMain() {
         log = LoggerFactory.getLogger(SchemaRegistryProfilerMain.class.getSimpleName());
         appConfig = new AppConfig(ConfigFactory.load());
-        kConsumer = createKafkaConsumer();
-        kProducer = createKafkaProducer();
-        kConsumer.subscribe(Collections.singleton(appConfig.getRawTopicName()));
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            kConsumer.close();
-            kProducer.close();
-        }));
-        work();
+        gson = new Gson();
     }
 
-    private static KafkaConsumer<String, String> createKafkaConsumer() {
-        Properties properties = new Properties();
-        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, appConfig.getBootstrapServers());
-        properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, appConfig.getConsumerGroupId());
-        properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        return new KafkaConsumer<>(properties);
+    public static void main(String[] args) {
+        SchemaRegistryProfilerMain srp = new SchemaRegistryProfilerMain();
+        SpecificAvroSerde<Stock> stockSerde = new SpecificAvroSerde<>();
+        stockSerde.configure(Collections.singletonMap(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, appConfig.getSchemaRegistryUrl()), false);
+        KafkaStreams kStreams = new KafkaStreams(srp.createTopology(stockSerde), srp.getStreamsConfig());
+        //kStreams.cleanUp();
+        kStreams.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(kStreams::close));
     }
 
-    private static KafkaProducer<String, Stock> createKafkaProducer() {
-        Properties properties = new Properties();
-        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, appConfig.getBootstrapServers());
-        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class.getName());
-        properties.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, appConfig.getSchemaRegistryUrl());
-        return new KafkaProducer<>(properties);
+    public Properties getStreamsConfig(){
+        Properties config = new Properties();
+        config.put(StreamsConfig.APPLICATION_ID_CONFIG, appConfig.getApplicationId());
+        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, appConfig.getBootstrapServers());
+        config.put(KafkaAvroSerializerConfig.SCHEMA_REGISTRY_URL_CONFIG, appConfig.getSchemaRegistryUrl());
+        config.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamsConfig.EXACTLY_ONCE_V2);
+        config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.StringSerde.class.getName());
+        config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, SpecificAvroSerde.class.getName());
+        return config;
     }
 
-    private static void work() {
-        String targetTopic = appConfig.getParsedTopicName();
-        log.info("Started polling for data at [" + appConfig.getRawTopicName() + "] topic.");
-        while(true){
-            ConsumerRecords<String, String> records = kConsumer.poll(Duration.ofMillis(appConfig.getConsumerPollInterval()));
-            for (ConsumerRecord<String, String> record : records){
-                String v = record.value();
-                log.info("Received stock from [" + appConfig.getRawTopicName() + "] topic: " + v);
-                Stock stock = parseJsonToStock(v);
-                log.info("Parsed stock to avro: " + stock);
-                if(stock!=null) {
-                    kProducer.send(new ProducerRecord<>(targetTopic, stock.getSymbol(), stock));
-                    log.info("Sent stock to [" + appConfig.getParsedTopicName() + "] topic.");
-                }
-            }
-            kConsumer.commitSync();
+    public Topology createTopology(SpecificAvroSerde<Stock> stockSerde) {
+        StreamsBuilder builder = new StreamsBuilder();
+        Serdes.StringSerde stringSerde = new Serdes.StringSerde();
+        builder.stream(appConfig.getRawTopicName(), Consumed.with(stringSerde, stringSerde))
+                // drop malformed records
+                .filter((k, v) -> isValidRecord(v))
+                // select symbol as key
+                .selectKey((k, v) -> Objects.requireNonNull(parseJsonToStock(v)).getSymbol())
+                // parse values to avro
+                .mapValues(this::parseJsonToStock)
+                // append record to application log
+                .peek((k, stock) -> log.info("Parsed record = " + stock))
+                // write to output topic
+                .to(appConfig.getParsedTopicName(), Produced.with(stringSerde, stockSerde));
+        return builder.build();
+    }
+
+    // check if record is in json format and has expected fields
+    public boolean isValidRecord(String payload) {
+        if(isValidJson(payload))
+            return parseJsonToStock(payload) != null;
+        return false;
+    }
+
+    // check if string is in json format
+    public boolean isValidJson(String payload) {
+        try {
+            gson.fromJson(payload, Object.class);
+            return true;
+        } catch(JsonSyntaxException e) {
+            return false;
         }
     }
 
-    private static Stock parseJsonToStock(String payload){
+    // parse json string to Stock
+    public Stock parseJsonToStock(String payload){
         final DateTimeFormatter formatter = DateTimeFormatter
                 .ofPattern(appConfig.getTimestampFormat())
                 .withZone(ZoneId.systemDefault());
@@ -95,7 +106,7 @@ public class SchemaRegistryProfilerMain {
                     json.get("close").getAsFloat(),
                     json.get("symbol").getAsString());
         }
-        catch (NullPointerException e){
+        catch (IllegalStateException | NullPointerException e){
             return null;
         }
     }

@@ -8,7 +8,7 @@ public class AppConfig {
     private final String schemaRegistryUrl;
     private final String rawTopicName;
     private final String parsedTopicName;
-    private final String consumerGroupId;
+    private final String applicationId;
     private final long consumerPollInterval;
     private final String timestampFormat;
 
@@ -17,7 +17,7 @@ public class AppConfig {
         this.schemaRegistryUrl = config.getString("kafka.schema.registry.url");
         this.rawTopicName = config.getString("kafka.raw.topic.name");
         this.parsedTopicName = config.getString("kafka.parsed.topic.name");
-        this.consumerGroupId = config.getString("app.consumer.group.id");
+        this.applicationId = config.getString("app.application.id");
         this.consumerPollInterval = config.getLong("app.consumer.poll.interval");
         this.timestampFormat = config.getString("app.timestamp.format");
     }
@@ -38,8 +38,8 @@ public class AppConfig {
         return parsedTopicName;
     }
 
-    public String getConsumerGroupId() {
-        return consumerGroupId;
+    public String getApplicationId() {
+        return applicationId;
     }
 
     public long getConsumerPollInterval() {
