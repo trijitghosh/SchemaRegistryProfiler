@@ -21,6 +21,7 @@
         <plugin.maven.compiler.version>3.10.0</plugin.maven.compiler.version>
         <plugin.build.helper.maven.version>3.3.0</plugin.build.helper.maven.version>
         <plugin.maven.remote.version>1.7.0</plugin.maven.remote.version>
+        <plugin.maven.checkstyle.version>3.1.2</plugin.maven.checkstyle.version>
     </properties>
 
     <!--necessary to resolve confluent dependencies-->
@@ -84,7 +85,7 @@
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-log4j12 -->
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-reload4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency>
 
@@ -194,6 +195,30 @@
                                 <source>target/generated-sources/avro</source>
                             </sources>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Enforce code checkStyle on compilation -->
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${plugin.maven.checkstyle.version}</version>
+                <configuration>
+                    <configLocation>checkStyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
