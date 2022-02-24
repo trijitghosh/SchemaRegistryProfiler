@@ -200,7 +200,7 @@
                 </executions>
             </plugin>
 
-            <!-- Enforce code checkStyle on compilation -->
+            <!-- enforce code checkStyle on compilation -->
             <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-checkstyle-plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
