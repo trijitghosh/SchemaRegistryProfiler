@@ -56,7 +56,7 @@ public class SchemaRegistryProfilerMain {
             appConfig.getSchemaRegistryUrl()), false);
     KafkaStreams kafkaStreams =
         new KafkaStreams(srp.createTopology(stockSerde), srp.getStreamsConfig());
-    //kStreams.cleanUp();
+    //kafkaStreams.cleanUp();
     kafkaStreams.start();
     Runtime.getRuntime().addShutdownHook(new Thread(kafkaStreams::close));
   }
