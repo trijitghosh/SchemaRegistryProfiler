@@ -46,9 +46,9 @@ public class SchemaRegistryProfilerTest {
     stockSerde.configure(Collections.singletonMap("schema.registry.url", "mock://dummy:5678"),
         false);
     testDriver = new TopologyTestDriver(schemaRegistryProfiler.createTopology(stockSerde), config);
-    inputTopic = testDriver.createInputTopic("time_series_intraday_prices", new StringSerializer(),
+    inputTopic = testDriver.createInputTopic("stock-raw", new StringSerializer(),
         new StringSerializer());
-    outputTopic = testDriver.createOutputTopic("company_stock", new StringDeserializer(),
+    outputTopic = testDriver.createOutputTopic("stock-parsed", new StringDeserializer(),
         stockSerde.deserializer());
   }
 
